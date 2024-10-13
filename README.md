@@ -1,5 +1,5 @@
-# pre-entrega1-backend2-coder-comision70115
-Pre entrega 1 , curso backend2 Coderhouse
+# entrega-final-backend2-coder-comision70115
+Entrega Final, curso backend2 Coderhouse
 ## Implementacion de usuarios
 ### Funciones
 Registro de usuarios

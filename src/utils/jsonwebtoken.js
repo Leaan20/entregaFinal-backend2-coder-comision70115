@@ -1,20 +1,12 @@
 import jwt from "jsonwebtoken";
+import configObject from "../config/dotConfig.js";
 
-const private_key = "myDirtyLittleSecret";
-
-const secret_cookie = "userCookieToken";
-
+const {private_key} = configObject;
 // Funcion que genera el token.
-const generateToken = (user) => {
-    const token = jwt.sign({user}, private_key, {expiresIn:"24h"});
+ const generateToken = (user) => {
+    const token = jwt.sign({user}, private_key, {expiresIn:"1h"});
 
     return token;
 };
 
-
-
-export {
-    generateToken,
-    secret_cookie,
-    private_key
- } ;
+export default generateToken;

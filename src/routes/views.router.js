@@ -4,20 +4,23 @@ import CartManager from "../dao/db/cart-manager-db.js";
 import ProductModel from "../dao/models/product.model.js";
 const viewsRouter = Router();
 import passport from "passport";
+import { soloAdmin, soloUser } from "../middleware/auth.js";
 import jwt from "jsonwebtoken";
-import { secret_cookie, private_key } from "../utils/jsonwebtoken.js";
+import configObject from "../config/dotConfig.js";
 //Instanciamos nuestro manager de productos.
 const manager = new ProductManager();
 const cartManager = new CartManager();
 
 
+
+const {secret_cookie, private_key} = configObject;
 // Products
 
 // Aplicamos paginate.
 // ejemplo de busqueda : http://localhost:8080/products?category=higiene%20personal&limit=1&page=2&sort=price&order=asc
 
 
-viewsRouter.get("/products", async (req,res) => {
+viewsRouter.get("/products",passport.authenticate("current", {session:false}), soloUser , async (req,res) => {
     try {
         // Utilizamos los query recibidos con la request
         const limit = parseInt(req.query.limit) || 10;
@@ -74,7 +77,7 @@ viewsRouter.get("/products", async (req,res) => {
 
 // Este router va a trabajar con websocket. para actualizar automaticamente la vista.
 
-viewsRouter.get("/realtimeproducts", (req,res) => {
+viewsRouter.get("/realtimeproducts", passport.authenticate("current", {session:false}), soloAdmin , (req,res) => {
     try {
         return res.render("realTimeProducts");
 
@@ -159,6 +162,8 @@ viewsRouter.get("/login", (req, res) => {
 
 viewsRouter.get("/profile", passport.authenticate("current", { session: false }), (req, res) => {
     try {
+        console.log(req.user);
+        
         res.render("profile", { user: req.user });
     } catch (error) {
         res.status(500).send("No es posible cargar el perfil");

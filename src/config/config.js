@@ -3,8 +3,10 @@
 import passport from "passport";
 // importamos jwt
 import jwt from "passport-jwt";
-// importamos nuestras variables
-import {secret_cookie, private_key} from "../utils/jsonwebtoken.js";
+
+import configObject from "./dotConfig.js";
+
+const { private_key, secret_cookie } = configObject;
 
 
 

@@ -9,14 +9,15 @@ import cookieParser from "cookie-parser";
 // importamos los modulos de passport y initializePassport con la estrategia
 import passport from "passport";
 import initializePassport from "./config/config.js";
-import { secret_cookie } from "./utils/jsonwebtoken.js";
+//importamos el objeto de configuracion
+import configObject from "./config/dotConfig.js";
 // importamos la conexion de mongoose.
-import "./database.js";
+import DataBase from "./database.js";
+// generamos la instancia con el patron Singleton
+const DBInstance = DataBase.getInstance();
 
-
+const { secret_cookie, port } = configObject;
 const app = express();
-const PORT = 8080;
-
 // Routes
 import productRouter from "./routes/products.router.js";
 import cartRouter from "./routes/carts.router.js";
@@ -67,9 +68,9 @@ res.send("Pagina de inicio, bienvenido 😁👌");
 
 // Creamos nuestro servidor.
 // utilizamos una referencia de nuestro servidor.
-const httpServer = app.listen(PORT, () => {
+const httpServer = app.listen(port, () => {
     // Este lo dejo para ingresar mas rapido al navegador.
-    console.log(`servidor escuchando desde el puerto: http://localhost:${PORT}`);
+    console.log(`servidor escuchando desde el puerto: http://localhost:${port}`);
 });
 
 
