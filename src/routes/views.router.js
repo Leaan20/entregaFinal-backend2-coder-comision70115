@@ -1,15 +1,13 @@
 import { Router } from "express";
-import ProductManager from "../dao/db/product-manager-db.js";
-import CartManager from "../dao/db/cart-manager-db.js";
-import ProductModel from "../dao/models/product.model.js";
+import ProductService from "../services/product.service.js";
+import CartService from "../services/cart.service.js";
 const viewsRouter = Router();
 import passport from "passport";
 import { soloAdmin, soloUser } from "../middleware/auth.js";
 import jwt from "jsonwebtoken";
 import configObject from "../config/dotConfig.js";
 //Instanciamos nuestro manager de productos.
-const manager = new ProductManager();
-const cartManager = new CartManager();
+
 
 
 
@@ -20,23 +18,24 @@ const {secret_cookie, private_key} = configObject;
 // ejemplo de busqueda : http://localhost:8080/products?category=higiene%20personal&limit=1&page=2&sort=price&order=asc
 
 
-viewsRouter.get("/products",passport.authenticate("current", {session:false}), soloUser , async (req,res) => {
+viewsRouter.get("/products", passport.authenticate("current", {session: false}), soloUser, async (req, res) => {
     try {
-        // Utilizamos los query recibidos con la request
+
+        const userCartId = req.user.cartId;
+        // Obtener query params con valores predeterminados
         const limit = parseInt(req.query.limit) || 10;
         const page = parseInt(req.query.page) || 1;
         const sort = req.query.sort || 'price';
         const order = req.query.order === 'desc' ? -1 : 1;
         const category = req.query.category || '';
 
-        // El primero objeto en paginate.
+        // Filtro por categoría
         const filter = {};
-
-        if(category) {
+        if (category) {
             filter.category = category;
         }
 
-        // Segundo objeto de paginate.
+        // Configuración de paginación
         const options = {
             limit,
             page,
@@ -44,10 +43,24 @@ viewsRouter.get("/products",passport.authenticate("current", {session:false}), s
             lean: true
         };
 
-        const products = await ProductModel.paginate(filter, options);
+        // Obtener los productos paginados
+        const products = await ProductService.paginateProducts(filter, options);
 
+        // Validar si hay productos
+        if (!products.docs || products.docs.length === 0) {
+            return res.status(404).send({
+                status: 'error',
+                message: 'No se encontraron productos en esta página'
+            });
+        }
+
+        // Imprimir productos para depuración
+        console.log(products.docs);
+
+        // Datos para la vista
         const payload = {
             payload: products.docs,
+            cartId: userCartId,
             status: "success",
             pagination: {
                 totalDocs: products.totalDocs,
@@ -65,11 +78,13 @@ viewsRouter.get("/products",passport.authenticate("current", {session:false}), s
                 category,
                 limit
             }
-        }
+        };
+
+        // Renderizar la vista con los productos
         res.status(200).render("home", payload);
 
-
     } catch (error) {
+        console.error("Error al obtener productos:", error);
         res.status(500).send("Hay un error del servidor, no podemos mostrar los productos");
     }
 });
@@ -92,7 +107,7 @@ viewsRouter.get("/realtimeproducts", passport.authenticate("current", {session:f
 viewsRouter.get("/carts/:cid", async (req, res) => {
     const { cid } = req.params;
     try {
-        const cart = await cartManager.getCartById(cid);
+        const cart = await CartService.getCartById(cid);
         if (!cart) {
             res.send(`No hay un carrito con el id ${cid}`);
             return;
@@ -106,7 +121,7 @@ viewsRouter.get("/carts/:cid", async (req, res) => {
             category: product.product.category,
             thumbnails: product.product.thumbnails
         }));
-
+        console.log('Contenido del carrito:', productInCart);
         res.render("cartView", { cart: productInCart });
 
     } catch (error) {
@@ -163,7 +178,12 @@ viewsRouter.get("/login", (req, res) => {
 viewsRouter.get("/profile", passport.authenticate("current", { session: false }), (req, res) => {
     try {
         console.log(req.user);
-        
+
+        // Si el usuario es un "admin", renderizamos el profile con la opcion de ir a la administracion de productos, caso contrario , lo enviamos con el acceso a la tienda.
+        if(req.user.role === "admin"){
+            res.render("profile", { user: req.user, isAdmin : true });
+            return;
+        }
         res.render("profile", { user: req.user });
     } catch (error) {
         res.status(500).send("No es posible cargar el perfil");

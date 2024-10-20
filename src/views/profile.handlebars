@@ -11,3 +11,25 @@
 </div>
 
 <button class="btn-form"><a href="./api/sessions/logout">logout</a></button>
+
+{{!-- Verificamos si el usuario es admin , asi le permitimos entrar a la administracion de productos, si es un usuario comun, le permitimos el ingreso a la tienda. --}}
+{{#if isAdmin}}
+    <div>
+        <p>Ir al centro de administracion de productos</p>
+        <button class="btn-form"><a href="/realtimeproducts">Products</a></button>
+    </div>
+
+{{else}}
+    <div>
+        <p>Ir a la tienda</p>
+        <button class="btn-form"><a href="/products">Shop 🛍️</a></button>
+    </div>
+    <div>
+        <p>Ir al carrito</p>
+        <button class="btn-form">
+            <a href="/carts/{{user.cart}}">Carrito 🛒</a>
+        </button>
+    </div>
+
+{{/if}}
+

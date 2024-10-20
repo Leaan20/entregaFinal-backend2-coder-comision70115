@@ -2,8 +2,12 @@
 
 import express from "express";
 import { engine } from "express-handlebars";
+//Server de socket.io
 import { Server } from "socket.io";
-import ProductManager from "./dao/db/product-manager-db.js";
+//importamos nuestro archivo de socket
+import socketHandler from "./socket/socketHandler.js";
+//importamos nuestro ProductServices para trabajar con socket.
+import ProductServices from "./services/product.service.js";
 // importamos cookieParser cookie-parser
 import cookieParser from "cookie-parser";
 // importamos los modulos de passport y initializePassport con la estrategia
@@ -58,13 +62,19 @@ app.set("view engine", "handlebars");
 // Donde se encuentran los archivos a renderizar.
 app.set("views", "./src/views");
 
-// Manager para actualizar info productos
-const manager = new ProductManager();
 
+// Ruta de inicio
 app.get("/", (req,res) => {
-
-res.send("Pagina de inicio, bienvenido 😁👌");
+    res.render("index");
 });
+
+// ruta para obtener la cookie en mi front
+app.get('/config', (req, res) => {
+    res.json({
+        secret_cookie: secret_cookie
+    });
+});
+
 
 // Creamos nuestro servidor.
 // utilizamos una referencia de nuestro servidor.
@@ -73,36 +83,8 @@ const httpServer = app.listen(port, () => {
     console.log(`servidor escuchando desde el puerto: http://localhost:${port}`);
 });
 
-
-
-
 // Configuramos el servidor con socket, io se recomienda para la instancia del backend.
 const io = new Server(httpServer);
 
-// abrimos el servidor con la conexion desde el back
-// acuerdo de conexion. recibimos el socket de cliente como parametro para poder recibir y enviar mensajes.
-
-io.on('connection', async (socket) => {
-
-    // enviamos los productos al cliente.
-    socket.emit("products", await manager.getProducts());
-
-    // Eliminamos el producto.
-    socket.on("productDelete", async (id) => {
-        await manager.deleteProduct(id);
-
-        // volvemos a enviar la lista actualizada.
-        socket.emit("products", await manager.getProducts() );
-    } );
-
-    // recibimos el nuevo producto:
-    socket.on("newProduct", async (data) => {
-        await manager.addProduct(data);
-
-        // volvemos a enviar la lista actualizada.
-        const updatedProducts = await manager.getProducts();
-        io.emit('updateProducts', updatedProducts);
-    });
-
-
-} );
+//Funcion que maneja el socket y actualiza los productos
+socketHandler(io);

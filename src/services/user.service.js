@@ -1,4 +1,4 @@
-// importamos el repositorio y las funciones de bcrypt.
+// importamos el repository y las funciones de bcrypt.
 import UserRepository from "../repositories/user.repository.js";
 import {createHash, isValidPassword} from "../utils/utils.js";
 
@@ -15,7 +15,7 @@ class UserServices {
             if(existingUser) throw new Error("El usuario ya existe");
 
             // Crear un carrito para el usuario y asociar el id al usuario.
-
+            
             //hasheamos el pass
             userData.password = createHash(userData.password);
             // creamos el usuario

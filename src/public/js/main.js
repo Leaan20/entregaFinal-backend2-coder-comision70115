@@ -72,5 +72,3 @@ productForm.addEventListener('submit', (evt) => {
     productForm.reset();
 });
 
-
-

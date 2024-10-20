@@ -1,7 +1,7 @@
 // Manager de carts MongoDB
 import CartModel from "../models/cart.model.js";
 
-
+// queda relegado a arquictectura MVC y DAO
 
 
 class CartManager {
