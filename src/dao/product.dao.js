@@ -5,7 +5,12 @@ import ProductModel from "./models/product.model.js"
 
 class ProductDAO {
     async findById(id){
-        return await ProductModel.findById(id);
+        try {
+            return await ProductModel.findById(id);
+        } catch (error) {
+            console.error("Error al buscar el producto:", error);
+            throw new Error("Error al buscar el producto.");
+        }
     }
 
     async findOne(query){

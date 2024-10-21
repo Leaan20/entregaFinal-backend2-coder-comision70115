@@ -131,6 +131,34 @@ viewsRouter.get("/carts/:cid", async (req, res) => {
     }
 });
 
+//// Finalizar compra \\\\
+
+viewsRouter.post("/:cid/purchase", async (req,res) => {
+    const {cid} = req.params;
+
+    try {
+        const Cartpurchase = await CartService.purchaseProducts(cid);
+        if (!cart) {
+            res.send(`No hay un carrito con el id ${cid}`);
+            return;
+        }
+
+        const ticketPurchase = Cartpurchase.map(item => ({
+            code: item.code,
+            purchase_datetime: item.purchase_datetime,
+            amount: item.amount,
+            purchaser: item.purchaser
+        }));
+
+        console.log('Contenido del ticket:', ticketPurchase);
+        res.render("ticketView", { ticket : ticketPurchase });
+
+
+    } catch (error) {
+        
+    }
+} )
+
 
 ////Sessions \\\\
 

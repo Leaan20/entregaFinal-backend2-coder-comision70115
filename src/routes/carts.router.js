@@ -5,7 +5,7 @@ import {Router} from "express";
 import jwt from "jsonwebtoken";
 import configObject from "../config/dotConfig.js";
 const  {secret_cookie, private_key} = configObject;
-
+import passport from "passport";
 const cartRouter = Router();
 
 
@@ -46,10 +46,18 @@ cartRouter.delete("/:cid",cartController.cartClean);
 cartRouter.put("/:cid", cartController.updateCart);
 
 
-
 // Actualiza solo la cantidad del mismo producto.
 
 cartRouter.put("/:cid/products/:pid", cartController.updateQuantity);
+
+
+// Ruta para finalizar compra
+cartRouter.post("/:cid/purchase", passport.authenticate("current", { session: false }), (req, res, next) => {
+    console.log("Usuario autenticado:", req.user); // Debería mostrar el usuario si está autenticado
+    next(); // Continúa al siguiente middleware
+}, cartController.purchaseCart);
+
+
 
 // Ruta para enviar informacion al front.
 cartRouter.get("/user/cart", (req,res) => {

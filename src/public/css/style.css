@@ -235,10 +235,14 @@ a {
   background-color: #d00;
 }
 
-
-
 .page {
   font-size:1.6em;
   color: #002;
 
+}
+
+
+.custom-title {
+  color: #ffcc00;
+  font-weight: bold;
 }

@@ -1,6 +1,13 @@
 // importamos el CartRepository
 import CartRepository from "../repositories/cart.repository.js";
 
+//importamos le ProductRepository para poder finalizar la compra
+import ProductRepository from "../repositories/product.repository.js";
+
+import TicketService from "../services/ticket.service.js";
+//importamos de util funciones para poder crear el ticket.
+import {totalize, buyTime, ticketId} from "../utils/utils.js";
+
 //implementamos la logica en el service
 
 class CartService {
@@ -150,8 +157,7 @@ class CartService {
                 { _id: cid },
                 { $pull: { products: { product: pid } } }
             ]);
-            
-            
+
             if (result.matchedCount === 0) {
                 // No se encontró el carrito o el producto
                 return false;
@@ -163,6 +169,87 @@ class CartService {
             throw new Error("Error al eliminar el producto del carrito.");
         }
     }
+
+    async purchaseProducts(cid, userEmail) {
+        try {
+            const cart = await CartRepository.getCartById(cid);
+            if (!cart || cart.products.length === 0) {
+                throw new Error("El carrito está vacío o no existe.");
+            }
+    
+            console.log("Carrito encontrado:", cart);
+            const products = cart.products;
+            let outStockProducts = [];
+            let productsToPurchase = [];
+            let totalAmount = 0;
+    
+            // Revisar stock de cada producto en el carrito
+            for (let item of products) {
+                const product = await ProductRepository.getProductById(item.product);
+                if (!product) {
+                    throw new Error(`El producto con ID ${item.product} no se encuentra.`);
+                }
+    
+                console.log(`Procesando producto: ${product.name}`);
+    
+                // Verificar stock
+                if (product.stock >= item.quantity) {
+                    console.log(`Producto ${product.name} agregado a la compra. Stock actualizado.`);
+                    productsToPurchase.push(item); // Agregar a productos a comprar
+                } else {
+                    console.log(`Producto ${product.name} sin stock suficiente`);
+                    outStockProducts.push(item); // Agregar a productos sin stock
+                }
+            }
+    
+            // Si hay productos con stock suficiente
+            if (productsToPurchase.length > 0) {
+                // Actualizar stock de los productos que se compran
+                for (let item of productsToPurchase) {
+                    console.log(`Buscando producto con ID: ${item.product}`);
+                    const product = await ProductRepository.getProductById(item.product);
+                    product.stock -= item.quantity; // Reducir stock
+    
+                    // Actualizar el stock en la base de datos
+                    await ProductRepository.updateProductById(product._id, product); // Aquí se actualiza el producto
+                }
+    
+                // Calcular el monto total utilizando la función totalize
+                totalAmount = totalize(productsToPurchase);
+    
+                // Crear el ticket con los productos comprados
+                const purchaseTicket = await TicketService.createTicket({
+                    code: ticketId(),
+                    purchase_datetime: buyTime(),
+                    cart: cid,
+                    amount: totalAmount,
+                    purchaser: userEmail // Cambiado para usar el email del usuario
+                });
+    
+                // Actualizar el carrito con los productos que no tienen stock suficiente
+                cart.products = outStockProducts;
+                await cart.save();
+    
+                console.log("Ticket de compra creado:", purchaseTicket);
+    
+                return {
+                    success: true,
+                    purchaseTicket, // Devuelve el ticket
+                    outStockProducts // Productos sin stock
+                };
+            } else {
+                // Si ningún producto tiene stock suficiente
+                return {
+                    success: false,
+                    message: "Ningún producto tiene stock suficiente.",
+                    outStockProducts
+                };
+            }
+        } catch (error) {
+            throw new Error("Error al finalizar la compra: " + error.message);
+        }
+    }
+    
 }
 
 export default new CartService();

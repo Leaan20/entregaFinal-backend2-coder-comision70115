@@ -60,5 +60,6 @@ class UserServices {
 
     // Se pueden implementar metodos para actualizar y borrar users.
 }
+
 //exportamos la instancia.
 export default new UserServices();

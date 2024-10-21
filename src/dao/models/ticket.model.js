@@ -7,15 +7,20 @@ const TicketSchema = new mongoose.Schema({
         unique: true
     },
     purchase_datetime: {
-
+        type: String,
+        required: true
     },
     amount:{
         type: Number,
         required: true,
     },
     purchaser:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref:"users",
+        type: String,
+        required: true
+    },
+    cart:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"carts"
     }
 
 });

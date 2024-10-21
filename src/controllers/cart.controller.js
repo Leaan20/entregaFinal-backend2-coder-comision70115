@@ -149,6 +149,42 @@ class CartController {
             res.status(500).send("No fue posible vaciar el carrito, prueba nuevamente más tarde.");
         }
     }
+
+    async purchaseCart(req, res) {
+        const { cid } = req.params;
+        
+        try {
+            if (!cid) {
+                return res.status(400).json({ message: "ID de carrito no proporcionado." });
+            }
+            
+            const result = await CartService.purchaseProducts(cid, req.user.email);
+    
+            if (!result.success && result.outStockProducts.length === 0) {
+                return res.status(400).json({
+                    message: "Ningún producto tiene stock suficiente.",
+                    outStockProducts: result.outStockProducts
+                });
+            }
+    
+            if (result.outStockProducts.length > 0) {
+                return res.status(200).json({
+                    message: "Algunos productos no tienen stock suficiente, pero el ticket fue generado para los productos disponibles.",
+                    outStockProducts: result.outStockProducts,
+                    ticket: result.purchaseTicket
+                });
+            }
+    
+            return res.status(201).json({
+                message: "El ticket de compra fue creado exitosamente.",
+                ticket: result.purchaseTicket
+            });
+    
+        } catch (error) {
+            console.error("Error en el proceso de compra:", error);
+            res.status(500).send("No pudo finalizarse la compra por un error interno");
+        }
+    }
 }
 
 export default CartController;

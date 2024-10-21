@@ -1,6 +1,6 @@
 // Importamos el ProductDAO
 import ProductDAO from "../dao/product.dao.js";
-
+import mongoose from "mongoose";
 class ProductRepository {
     async createProduct(productData){
         return await ProductDAO.save(productData);
@@ -15,6 +15,9 @@ class ProductRepository {
     }
 
     async getProductById(id){
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw new Error(`El ID proporcionado no es válido: ${id}`);
+        }
         return await ProductDAO.findById(id);
     }
 
