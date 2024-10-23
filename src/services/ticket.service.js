@@ -16,8 +16,21 @@ class TicketService {
 
         } catch (error) {
             console.log(error);
+            throw new Error(error);
+        }
+    }
+    
+    async findTicketByCode(code){
+        try {
+            const existingTicket = await ticketRepository.getTicketByCode(code);
+            if(!existingTicket){
+                throw new Error("El Ticket buscado , no existe en el sistema");
+            }
 
-            return ({message: "No es posible crear el ticket de compra", error: error});
+            return existingTicket;
+        } catch (error) {
+            console.error(error);
+            throw error;
         }
     }
 

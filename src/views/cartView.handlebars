@@ -6,7 +6,7 @@
 <div class="infoContain">
     <button class="btn-form"><a href="/profile">Profile👤</a></button>
 </div>
-<div class="cartContainer">
+<div class="cartContainer" data-cart-id="{{cid}}">
         <ul class="productContain">
             {{#each cart}}
                 <li class="cartProduct">
@@ -30,11 +30,13 @@
 
 <div class="actionContain">
     <div>
-        <button class="cleanCart">Clean Cart</button>
+        <button class="btn-form cleanCart">Clean Cart</button>
     </div>
     <div>
-        <button class="cleanCart buyCart">Buy</button>
+        <button class="btn-form buyCart">Buy</button>
     </div>
 </div>
    
 
+{{!-- Mi archivo js --}}
+<script type="module" src="/js/purchase.js"></script>

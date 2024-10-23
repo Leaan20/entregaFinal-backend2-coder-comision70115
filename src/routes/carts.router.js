@@ -52,7 +52,7 @@ cartRouter.put("/:cid/products/:pid", cartController.updateQuantity);
 
 
 // Ruta para finalizar compra
-cartRouter.post("/:cid/purchase", passport.authenticate("current", { session: false }), (req, res, next) => {
+cartRouter.post("/:cid/purchase",passport.authenticate("current", { session: false }) ,(req, res, next) => {
     console.log("Usuario autenticado:", req.user); // Debería mostrar el usuario si está autenticado
     next(); // Continúa al siguiente middleware
 }, cartController.purchaseCart);
@@ -60,22 +60,23 @@ cartRouter.post("/:cid/purchase", passport.authenticate("current", { session: fa
 
 
 // Ruta para enviar informacion al front.
-cartRouter.get("/user/cart", (req,res) => {
-    const token = req.cookies[secret_cookie];
+// cartRouter.get("/user/cart", (req,res) => {
+//     const token = req.cookies[secret_cookie];
 
-    if(!token){
-        res.status(401).json({message: "No se encuentra la cookie o no estas autorizado a accederla", })
-    }
+//     if(!token){
+//         res.status(401).json({message: "No se encuentra la cookie o no estas autorizado a accederla", })
+//     }
 
-    try {
-        const decodedToken = jwt.verify(token, private_key);
+//     try {
+//         const decodedToken = jwt.verify(token, private_key);
 
-        const cid = decodedToken.user.cart;
+//         const cid = decodedToken.user.cart;
+//         const userEmail = decodedToken.user.email;
 
-        res.status(200). json({cid});
-    } catch (error) {
-        res.status(401).send({message: "Token invalido"});
-    }
-})
+//         res.status(200). json({cid, userEmail});
+//     } catch (error) {
+//         res.status(401).send({message: "Token invalido"});
+//     }
+// })
 
 export default cartRouter;

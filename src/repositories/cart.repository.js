@@ -1,6 +1,9 @@
 // importamos el DAO de cart
 import CartDAO from "../dao/cart.dao.js";
 
+import mongoose from 'mongoose';
+
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 // Creamos el repository de cart
 
 class CartRepository {
@@ -8,8 +11,21 @@ class CartRepository {
         return await CartDAO.save();
     }
 
-    async getCartById(cid){
-        return await CartDAO.findById(cid);
+
+    async getCartById(cid) {
+        try {
+            if (!isValidObjectId(cid)) {
+                throw new Error(`El id ${cid} no es un ObjectId válido`);
+            }
+            const cart = await CartDAO.findById(cid);
+            if (!cart) {
+                throw new Error(`No se encontró el carrito con id ${cid}`);
+            }
+            return cart;
+        } catch (error) {
+            console.error(`Error en CartRepository.getCartById: ${error.message}`);
+            throw error;
+        }
     }
 
     async addProductToCart(cid,cartData){

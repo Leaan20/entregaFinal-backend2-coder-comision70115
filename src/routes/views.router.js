@@ -1,6 +1,7 @@
 import { Router } from "express";
 import ProductService from "../services/product.service.js";
 import CartService from "../services/cart.service.js";
+import TicketService from "../services/ticket.service.js";
 const viewsRouter = Router();
 import passport from "passport";
 import { soloAdmin, soloUser } from "../middleware/auth.js";
@@ -21,7 +22,7 @@ const {secret_cookie, private_key} = configObject;
 viewsRouter.get("/products", passport.authenticate("current", {session: false}), soloUser, async (req, res) => {
     try {
 
-        const userCartId = req.user.cartId;
+        const cid = req.user.cart;
         // Obtener query params con valores predeterminados
         const limit = parseInt(req.query.limit) || 10;
         const page = parseInt(req.query.page) || 1;
@@ -60,7 +61,7 @@ viewsRouter.get("/products", passport.authenticate("current", {session: false}),
         // Datos para la vista
         const payload = {
             payload: products.docs,
-            cartId: userCartId,
+            cartId: cid,
             status: "success",
             pagination: {
                 totalDocs: products.totalDocs,
@@ -81,7 +82,12 @@ viewsRouter.get("/products", passport.authenticate("current", {session: false}),
         };
 
         // Renderizar la vista con los productos
-        res.status(200).render("home", payload);
+        res.status(200).render("home", {
+            products: payload.payload,  // Aquí pasamos directamente los productos
+            pagination: payload.pagination,
+            query: payload.query,
+            cid: cid
+        });
 
     } catch (error) {
         console.error("Error al obtener productos:", error);
@@ -106,12 +112,14 @@ viewsRouter.get("/realtimeproducts", passport.authenticate("current", {session:f
 
 viewsRouter.get("/carts/:cid", async (req, res) => {
     const { cid } = req.params;
+    console.log(`ID recibido: ${cid}`);
     try {
         const cart = await CartService.getCartById(cid);
         if (!cart) {
             res.send(`No hay un carrito con el id ${cid}`);
             return;
         }
+        console.log(`Carrito encontrado con el id: ${cid}`)
         // utilizamos el product(referenciado a cada elemento del array), en su array product. y sus distintas propiedades.
         const productInCart = cart.products.map(product => ({
             productId: product.product._id,
@@ -122,7 +130,7 @@ viewsRouter.get("/carts/:cid", async (req, res) => {
             thumbnails: product.product.thumbnails
         }));
         console.log('Contenido del carrito:', productInCart);
-        res.render("cartView", { cart: productInCart });
+        res.render("cartView", { cart: productInCart, cid: cid });
 
     } catch (error) {
         res.status(500).send("Hay un error , no es posible mostrar el carrito.");
@@ -133,31 +141,30 @@ viewsRouter.get("/carts/:cid", async (req, res) => {
 
 //// Finalizar compra \\\\
 
-viewsRouter.post("/:cid/purchase", async (req,res) => {
-    const {cid} = req.params;
+// Ruta para renderizar el ticket
+viewsRouter.get("/ticket/:code", async (req, res) => {
+    const { code } = req.params;
 
     try {
-        const Cartpurchase = await CartService.purchaseProducts(cid);
-        if (!cart) {
-            res.send(`No hay un carrito con el id ${cid}`);
-            return;
+        // Busca el ticket usando el código
+        const ticket = await TicketService.findTicketByCode(code);
+
+        if (!ticket) {
+            return res.status(404).send("Ticket no encontrado.");
         }
 
-        const ticketPurchase = Cartpurchase.map(item => ({
-            code: item.code,
-            purchase_datetime: item.purchase_datetime,
-            amount: item.amount,
-            purchaser: item.purchaser
-        }));
+        // Convertir el ticket a un objeto plano
+        const plainTicket = JSON.parse(JSON.stringify(ticket));
 
-        console.log('Contenido del ticket:', ticketPurchase);
-        res.render("ticketView", { ticket : ticketPurchase });
-
-
+        // Renderiza la vista del ticket con el objeto plano
+        return res.render("ticketView", { ticket: { purchaseTicket: plainTicket } });
     } catch (error) {
-        
+        console.error("Error al obtener el ticket:", error);
+        return res.status(500).send("Error al mostrar el ticket.");
     }
-} )
+});
+
+
 
 
 ////Sessions \\\\

@@ -1,4 +1,32 @@
-<div class="ticketContainer">
+<div class="form-container">
+    <h1>Ticket de Compra</h1>
+    <h2>¡Muchas gracias por su compra! 😊</h2>
+    <p>Código de compra: <b>{{ticket.purchaseTicket.code}}</b></p>
+    <p>Fecha de Compra: <b>{{ticket.purchaseTicket.purchase_datetime}}</b></p>
+    <p>Monto Total: <b>${{ticket.purchaseTicket.amount}}</b></p>
+    <p>Comprador: <b>{{ticket.purchaseTicket.purchaser}}</b></p>
+</div>
+
+
+{{#if outStockProducts.length}}
+    <div class="productContain">
+        <h2>Productos sin stock:</h2>
+    <ul>
+        {{#each outStockProducts}}
+            <li>{{this.name}} - Cantidad: {{this.quantity}}</li>
+        {{/each}}
+    </ul>
+    </div>
+{{/if}}
+
+<h3>Volver al Perfil</h3>
+<button class="btn-form" onclick="window.location.href='/profile'">Profile</button>
+
+
+
+
+
+{{!-- <div class="ticketContainer">
     <div>
         <h2>Informacion de la compra</h2>
     </div>
@@ -13,4 +41,4 @@
 
 <div>
     <button class="btn-form"><a href="/profile">Profile</a></button>
-</div>
+</div> --}}

@@ -150,39 +150,109 @@ class CartController {
         }
     }
 
+    // async purchaseCart(req, res) {
+    //     const { cid } = req.params;
+    //     console.log(req.user.email);
+        
+    //     console.log("Usuario autenticado:", req.user.email);
+    //     try {
+    //         if (!cid) {
+    //             return res.status(400).json({ message: "ID de carrito no proporcionado." });
+    //         }
+            
+    //         const result = await CartService.purchaseProducts(cid, req.user.email);
+    
+    //         if (!result.success && result.outStockProducts.length === 0) {
+    //             return res.status(400).json({
+    //                 message: "Ningún producto tiene stock suficiente.",
+    //                 outStockProducts: result.outStockProducts || []  // Asegúrate de que sea un array
+    //             });
+    //         }
+    
+    //         if (result.outStockProducts.length > 0) {
+    //             return res.status(200).json({
+    //                 message: "Algunos productos no tienen stock suficiente.",
+    //                 outStockProducts: result.outStockProducts,
+    //                 ticket: result.purchaseTicket || null  // Asegúrate de que ticket exista
+    //             });
+    //         }
+    
+    //         return res.status(201).json({
+    //             message: "El ticket de compra fue creado exitosamente.",
+    //             ticket: result.purchaseTicket
+    //         });
+    
+    //     } catch (error) {
+    //         console.error("Error en el proceso de compra:", error);
+    //         res.status(500).send("No pudo finalizarse la compra por un error interno");
+    //     }
+    // }
+
+    // async purchaseCart(req, res) {
+    //     const { cid } = req.params;
+    //     console.log(req.user.email);
+    //     console.log("Usuario autenticado:", req.user.email);
+    
+    //     try {
+    //         if (!cid) {
+    //             return res.status(400).json({ message: "ID de carrito no proporcionado." });
+    //         }
+    
+    //         const result = await CartService.purchaseProducts(cid, req.user.email);
+    
+    //         // Caso donde ningún producto tiene stock suficiente
+    //         if (!result.success && result.outStockProducts.length === 0) {
+    //             return res.status(400).json({
+    //                 message: "Ningún producto tiene stock suficiente.",
+    //                 outStockProducts: result.outStockProducts || []  // Asegúrate de que sea un array
+    //             });
+    //         }
+    
+    //         // Caso donde algunos productos no tienen stock suficiente
+    //         if (result.outStockProducts.length > 0) {
+    //             return res.status(200).json({
+    //                 message: "Algunos productos no tienen stock suficiente.",
+    //                 outStockProducts: result.outStockProducts,
+    //                 ticket: result.purchaseTicket || null  // Asegúrate de que el ticket exista
+    //             });
+    //         }
+    
+    //         // Caso de éxito: renderizar la vista del ticket
+    //         return res.status(201).render("ticketView", {
+    //             ticket: result.purchaseTicket,  // Pasar el ticket para la vista Handlebars
+    //             outStockProducts: result.outStockProducts
+    //         });
+    
+    //     } catch (error) {
+    //         console.error("Error en el proceso de compra:", error);
+    //         res.status(500).send("No pudo finalizarse la compra por un error interno");
+    //     }
+    // }
+
+
     async purchaseCart(req, res) {
         const { cid } = req.params;
-        
+    
         try {
-            if (!cid) {
-                return res.status(400).json({ message: "ID de carrito no proporcionado." });
-            }
-            
             const result = await CartService.purchaseProducts(cid, req.user.email);
     
-            if (!result.success && result.outStockProducts.length === 0) {
-                return res.status(400).json({
-                    message: "Ningún producto tiene stock suficiente.",
-                    outStockProducts: result.outStockProducts
-                });
-            }
-    
+            // Verificar si hay productos sin stock
             if (result.outStockProducts.length > 0) {
                 return res.status(200).json({
-                    message: "Algunos productos no tienen stock suficiente, pero el ticket fue generado para los productos disponibles.",
+                    success: false,
                     outStockProducts: result.outStockProducts,
-                    ticket: result.purchaseTicket
+                    ticket: result.purchaseTicket || null
                 });
             }
     
-            return res.status(201).json({
-                message: "El ticket de compra fue creado exitosamente.",
-                ticket: result.purchaseTicket
+            // En caso de éxito, devolver el ticket como JSON
+            return res.status(200).json({
+                success: true,
+                purchaseTicket: result.purchaseTicket
             });
-    
         } catch (error) {
             console.error("Error en el proceso de compra:", error);
-            res.status(500).send("No pudo finalizarse la compra por un error interno");
+            return res.status(500).send("No pudo finalizarse la compra por un error interno");
         }
     }
 }

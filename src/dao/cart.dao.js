@@ -1,11 +1,16 @@
 // Importamos el CartModel
 import CartModel from "./models/cart.model.js";
+import mongoose from "mongoose";
+
 
 //Crear class del DAO de cart.
 //Se va a encargar de la conexion con MongoDB.
 class CartDAO {
     async findById(id) {
         try {
+            if (!mongoose.isValidObjectId(id)) {
+                throw new Error(`ID inválido: ${id}`);
+            }
             return await CartModel.findById(id).populate('products.product');
         } catch (error) {
             throw new Error("Error al encontrar el carrito: " + error.message);

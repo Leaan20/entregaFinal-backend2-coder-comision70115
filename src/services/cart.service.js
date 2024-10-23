@@ -22,13 +22,14 @@ class CartService {
     }
 
     // Obtener un carrito por su id
-    async getCartById(id){
+    async getCartById(cid){
         try {
-            const cart = await CartRepository.getCartById(id);
+            const cart = await CartRepository.getCartById(cid);
             console.log(cart);
             
             return cart;
         } catch (error) {
+            console.error("Error al encontrar el carrito:", error);
             throw new Error("Error al encontrar el carrito");
         }
     }
@@ -48,7 +49,7 @@ class CartService {
         try{
             const cart = await CartRepository.getCartById(cid);
 
-            if(!cart || cart.products.legth === 0){
+            if(!cart || cart.products.length === 0){
                 throw new Error("Error al encontrar el carrito");
             }
             // Vaciamos el array de productos
@@ -190,14 +191,14 @@ class CartService {
                     throw new Error(`El producto con ID ${item.product} no se encuentra.`);
                 }
     
-                console.log(`Procesando producto: ${product.name}`);
+                console.log(`Procesando producto: ${item.title}`);
     
                 // Verificar stock
                 if (product.stock >= item.quantity) {
-                    console.log(`Producto ${product.name} agregado a la compra. Stock actualizado.`);
+                    console.log(`Producto ${product.title} agregado a la compra. Stock actualizado.`);
                     productsToPurchase.push(item); // Agregar a productos a comprar
                 } else {
-                    console.log(`Producto ${product.name} sin stock suficiente`);
+                    console.log(`Producto ${product.title} sin stock suficiente`);
                     outStockProducts.push(item); // Agregar a productos sin stock
                 }
             }
@@ -223,7 +224,7 @@ class CartService {
                     purchase_datetime: buyTime(),
                     cart: cid,
                     amount: totalAmount,
-                    purchaser: userEmail // Cambiado para usar el email del usuario
+                    purchaser: userEmail
                 });
     
                 // Actualizar el carrito con los productos que no tienen stock suficiente
