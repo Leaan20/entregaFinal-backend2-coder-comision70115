@@ -1,6 +1,6 @@
 
 
-// Lógica para limpiar el carrito
+// Limpiar el carrito
 document.querySelector('.cleanCart').addEventListener('click', async () => {
     const { value: confirm } = await Swal.fire({
         title: '¿Estás seguro?',
@@ -42,10 +42,11 @@ document.querySelector('.cleanCart').addEventListener('click', async () => {
     }
 });
 
-// Lógica para finalizar la compra
+// Finalizar la compra
+
 document.querySelector('.buyCart').addEventListener('click', async () => {
     try {
-        // Obtener el `cartId` desde el DOM (atributo `data-cart-id`)
+        // Obtener el cartId desde el atributo
         const cartId = document.querySelector('.cartContainer').getAttribute('data-cart-id');
 
         if (!cartId) {
@@ -70,23 +71,28 @@ document.querySelector('.buyCart').addEventListener('click', async () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                credentials: 'include' // Para asegurarse de que las cookies se envían
+                credentials: 'include'
             });
 
-            if (purchaseResponse.ok) {
-                const result = await purchaseResponse.json();
+            const result = await purchaseResponse.json();
+            console.log(result);
+
+            // Estoy teniendo un problema en la vista, el ticket se genera igual en el back, pero si quedan productos en el carrito va a lanzar el mensaje de error, pero el ticket se genera igual en la base, y los productos sin stock quedan en el carrito (MODIFICAR)
+
+            if (result.success && result.purchaseTicket) {
                 // Redirigir a la página del ticket usando el código del ticket
+                console.log(result.purchaseTicket.code);
                 window.location.href = `/ticket/${result.purchaseTicket.code}`;
             } else {
-                const result = await purchaseResponse.json();
-                if (result.outStockProducts) {
+                // Manejar los productos fuera de stock
+                if (result.outStockProducts && result.outStockProducts.length > 0) {
                     Swal.fire({
                         title: 'Error!',
-                        text: `No hay suficiente stock para: ${result.outStockProducts.map(p => p.product.name).join(', ')}`,
+                        text: `No hay suficiente stock para: ${result.outStockProducts.map(p => p.product.title).join(', ')}`,
                         icon: 'error'
                     });
                 } else {
-                    Swal.fire('Error!', result.message, 'error');
+                    Swal.fire('Error!', result.message || 'No se pudo procesar la compra.', 'error');
                 }
             }
         }

@@ -6,8 +6,6 @@ import { engine } from "express-handlebars";
 import { Server } from "socket.io";
 //importamos nuestro archivo de socket
 import socketHandler from "./socket/socketHandler.js";
-//importamos nuestro ProductServices para trabajar con socket.
-import ProductServices from "./services/product.service.js";
 // importamos cookieParser cookie-parser
 import cookieParser from "cookie-parser";
 // importamos los modulos de passport y initializePassport con la estrategia
@@ -77,6 +75,7 @@ app.get('/config', (req, res) => {
 
 
 // Creamos nuestro servidor.
+
 // utilizamos una referencia de nuestro servidor.
 const httpServer = app.listen(port, () => {
     // Este lo dejo para ingresar mas rapido al navegador.

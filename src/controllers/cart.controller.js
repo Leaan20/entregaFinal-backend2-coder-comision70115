@@ -5,6 +5,7 @@ import CartService from "../services/cart.service.js";
 
 class CartController {
     // obtener un carrito.
+    
     async getCart(req,res){
         const {cid} = req.params;
         try {
@@ -21,6 +22,7 @@ class CartController {
         }
     }
     //crear un nuevo carrito.
+
     async newCart(req,res){
         try {
             const newCart = await CartService.create();
@@ -34,6 +36,7 @@ class CartController {
         }
     }
     //Eliminar un carrito
+
     async DeleteCart(req,res){
         const {cid} = req.params;
 
@@ -64,6 +67,7 @@ class CartController {
         }
     }
     // Actualizar la cantidad de un producto.
+
     async updateQuantity(req,res){
         const {cid, pid} = req.params;
         const {quantity} = req.body;
@@ -91,7 +95,8 @@ class CartController {
     }
 
 
-    //Actualizamos el carrito
+    // Actualizamos el carrito
+
     async updateCart(req,res){
         const {cid} = req.params;
         const cartData = req.body;
@@ -113,7 +118,8 @@ class CartController {
             res.status(500).send("Tenemos un error, no podemos actualizar el carrito en este momento.");
         }
     }
-    //Eliminamos un producto del carrito
+    // Eliminamos un producto del carrito
+
     async deleteProductInCart(req,res){
         const { cid, pid } = req.params;
 
@@ -130,6 +136,8 @@ class CartController {
             res.status(500).send("Error al intentar eliminar el producto.");
         }
     }
+
+    // Vaciar el carrito
 
     async cartClean(req,res){
         const { cid } = req.params;
@@ -150,85 +158,7 @@ class CartController {
         }
     }
 
-    // async purchaseCart(req, res) {
-    //     const { cid } = req.params;
-    //     console.log(req.user.email);
-        
-    //     console.log("Usuario autenticado:", req.user.email);
-    //     try {
-    //         if (!cid) {
-    //             return res.status(400).json({ message: "ID de carrito no proporcionado." });
-    //         }
-            
-    //         const result = await CartService.purchaseProducts(cid, req.user.email);
-    
-    //         if (!result.success && result.outStockProducts.length === 0) {
-    //             return res.status(400).json({
-    //                 message: "Ningún producto tiene stock suficiente.",
-    //                 outStockProducts: result.outStockProducts || []  // Asegúrate de que sea un array
-    //             });
-    //         }
-    
-    //         if (result.outStockProducts.length > 0) {
-    //             return res.status(200).json({
-    //                 message: "Algunos productos no tienen stock suficiente.",
-    //                 outStockProducts: result.outStockProducts,
-    //                 ticket: result.purchaseTicket || null  // Asegúrate de que ticket exista
-    //             });
-    //         }
-    
-    //         return res.status(201).json({
-    //             message: "El ticket de compra fue creado exitosamente.",
-    //             ticket: result.purchaseTicket
-    //         });
-    
-    //     } catch (error) {
-    //         console.error("Error en el proceso de compra:", error);
-    //         res.status(500).send("No pudo finalizarse la compra por un error interno");
-    //     }
-    // }
-
-    // async purchaseCart(req, res) {
-    //     const { cid } = req.params;
-    //     console.log(req.user.email);
-    //     console.log("Usuario autenticado:", req.user.email);
-    
-    //     try {
-    //         if (!cid) {
-    //             return res.status(400).json({ message: "ID de carrito no proporcionado." });
-    //         }
-    
-    //         const result = await CartService.purchaseProducts(cid, req.user.email);
-    
-    //         // Caso donde ningún producto tiene stock suficiente
-    //         if (!result.success && result.outStockProducts.length === 0) {
-    //             return res.status(400).json({
-    //                 message: "Ningún producto tiene stock suficiente.",
-    //                 outStockProducts: result.outStockProducts || []  // Asegúrate de que sea un array
-    //             });
-    //         }
-    
-    //         // Caso donde algunos productos no tienen stock suficiente
-    //         if (result.outStockProducts.length > 0) {
-    //             return res.status(200).json({
-    //                 message: "Algunos productos no tienen stock suficiente.",
-    //                 outStockProducts: result.outStockProducts,
-    //                 ticket: result.purchaseTicket || null  // Asegúrate de que el ticket exista
-    //             });
-    //         }
-    
-    //         // Caso de éxito: renderizar la vista del ticket
-    //         return res.status(201).render("ticketView", {
-    //             ticket: result.purchaseTicket,  // Pasar el ticket para la vista Handlebars
-    //             outStockProducts: result.outStockProducts
-    //         });
-    
-    //     } catch (error) {
-    //         console.error("Error en el proceso de compra:", error);
-    //         res.status(500).send("No pudo finalizarse la compra por un error interno");
-    //     }
-    // }
-
+    // Finalizar la compra del carrito
 
     async purchaseCart(req, res) {
         const { cid } = req.params;
@@ -244,11 +174,11 @@ class CartController {
                     ticket: result.purchaseTicket || null
                 });
             }
-    
+            console.log(result.purchaseTicket);
             // En caso de éxito, devolver el ticket como JSON
             return res.status(200).json({
                 success: true,
-                purchaseTicket: result.purchaseTicket
+                purchaseTicket: result.purchaseTicket,
             });
         } catch (error) {
             console.error("Error en el proceso de compra:", error);

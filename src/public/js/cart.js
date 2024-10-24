@@ -43,19 +43,19 @@ async function addToCart(cid, pid, quantity) {
         if (!response.ok) {
             throw new Error('Error al agregar al carrito');
         }
-
-        const data = await response.json(); // Obtenemos la respuesta en formato JSON
+        // Obtenemos la respuesta en formato JSON
+        const data = await response.json();
         console.log("Producto agregado al carrito:", data);
-        return data; // Devolvemos la respuesta para manejarla en el evento
+        return data;
     } catch (error) {
         console.error("Error al agregar al carrito:", error);
-        throw error; // Re-lanzamos el error para manejarlo más arriba
+        throw error;
     }
 }
     // obtenemos el carrito en el atributo del carrito
     const cid = document.querySelector("#dataCart").getAttribute("data-cart-id");
     console.log(cid);
-// añadir evento a los botones
+    // añadir evento a los botones
     const buttons = document.querySelectorAll(".btn");
     buttons.forEach(button => {
         button.addEventListener("click", function() {
@@ -72,14 +72,14 @@ async function addToCart(cid, pid, quantity) {
                 Swal.fire({
                     position: 'top-end',  // Posición del toast
                     icon: 'success',       // Tipo de alerta
-                    title: `Producto "${title}" agregado al carrito.`,  // Mensaje
-                    showConfirmButton: false,  // No mostrar botón de confirmación
-                    timer: 2000,             // Tiempo en milisegundos para que desaparezca
-                    toast: true,        // Habilitar modo toast
-                    iconColor: '#fea',  // Cambia el color del icono
-                    background: '#003dff', // Cambia el color de fondo
+                    title: `Producto "${title}" agregado al carrito.`,
+                    showConfirmButton: false,
+                    timer: 2000,
+                    toast: true,
+                    iconColor: '#fea',
+                    background: '#003dff',
                     customClass: {
-                        title: 'custom-title' // Clase personalizada para el título
+                        title: 'custom-title'
                     }
                 });
             })

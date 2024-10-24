@@ -13,8 +13,8 @@ const { private_key, secret_cookie } = configObject;
 // Jwt utilizamos Json Web Token.
 
 
-const JWTStrategy = jwt.Strategy; 
-const ExtractJwt = jwt.ExtractJwt; 
+const JWTStrategy = jwt.Strategy;
+const ExtractJwt = jwt.ExtractJwt;
 
 const initializePassport = () => {
 

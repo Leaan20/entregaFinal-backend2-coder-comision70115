@@ -2,9 +2,6 @@
 // cart controller
 import CartController from "../controllers/cart.controller.js";
 import {Router} from "express";
-import jwt from "jsonwebtoken";
-import configObject from "../config/dotConfig.js";
-const  {secret_cookie, private_key} = configObject;
 import passport from "passport";
 const cartRouter = Router();
 
@@ -59,24 +56,6 @@ cartRouter.post("/:cid/purchase",passport.authenticate("current", { session: fal
 
 
 
-// Ruta para enviar informacion al front.
-// cartRouter.get("/user/cart", (req,res) => {
-//     const token = req.cookies[secret_cookie];
 
-//     if(!token){
-//         res.status(401).json({message: "No se encuentra la cookie o no estas autorizado a accederla", })
-//     }
-
-//     try {
-//         const decodedToken = jwt.verify(token, private_key);
-
-//         const cid = decodedToken.user.cart;
-//         const userEmail = decodedToken.user.email;
-
-//         res.status(200). json({cid, userEmail});
-//     } catch (error) {
-//         res.status(401).send({message: "Token invalido"});
-//     }
-// })
 
 export default cartRouter;

@@ -2,7 +2,7 @@
 import bcrypt from "bcrypt";
 //Importamos la libreria de uuid para generar identificadores unicos
 import {v4 as uuidv4} from 'uuid';
-// importamos una libreria para formato de fechas 
+// importamos una libreria para formato de fechas
 import { format } from 'date-fns';
 // Funcion de hasheo
 const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
@@ -16,7 +16,7 @@ const ticketId = () => uuidv4();
 
 // funcion de totalizar para la compra. va a recibir un array con los products del cart.
 
-const totalize = (products) => 
+const totalize = (products) =>
     products.reduce((total, product) => total + (product.product.price * product.quantity), 0);
 
 // const buyTime = () => new Date().toISOString();

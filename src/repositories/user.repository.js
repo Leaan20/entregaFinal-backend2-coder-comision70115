@@ -15,8 +15,6 @@ class UserRepository {
         return await UserDao.findOne({email});
     }
 
-    // pueden crearse metodos para actualizar y eliminar (update y delete)
-    
     async updateUserById(id,userData){
         return await UserDao.update(id,userData);
     }
@@ -24,7 +22,7 @@ class UserRepository {
     async deleteUserById(id){
         return await UserDao.delete(id);
     }
-    
+
 
 }
 // lo importamos ya instanciado

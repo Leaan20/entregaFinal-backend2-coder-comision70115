@@ -65,6 +65,7 @@ class CartService {
         }
     }
 
+    // Agregar productos al carrito
     async addProduct(cid, pid, quantity = 1){
         try {
             const cart = await CartRepository.getCartById(cid);
@@ -209,10 +210,11 @@ class CartService {
                 for (let item of productsToPurchase) {
                     console.log(`Buscando producto con ID: ${item.product}`);
                     const product = await ProductRepository.getProductById(item.product);
-                    product.stock -= item.quantity; // Reducir stock
+                    // Restar stock
+                    product.stock -= item.quantity;
     
-                    // Actualizar el stock en la base de datos
-                    await ProductRepository.updateProductById(product._id, product); // Aquí se actualiza el producto
+                    // Actualizar el stock del producto en la DB
+                    await ProductRepository.updateProductById(product._id, product);
                 }
     
                 // Calcular el monto total utilizando la función totalize

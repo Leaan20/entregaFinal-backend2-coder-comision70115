@@ -8,11 +8,12 @@
                 <p>Description: {{this.description}}</p>
                 <p>Category: {{this.category}}</p>
                 <p>Price: {{this.price}}</p>
+                <p>StockÑ{{this.stock}}</p>
                 <div>
                     <img src="{{this.thumbnails}}" alt="{{this.title}}">
                 </div>
                 <div>
-                    {{!-- aqui deberia poder permitir agregar cantidad --}}
+                    {{!-- agregar cantidad --}}
                     <label for="quantity-{{this.id}}">Quantity:</label>
                     <input type="number" id="quantity-{{this.id}}" name="quantity" value="1" min="1">
                 </div>

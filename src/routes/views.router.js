@@ -2,17 +2,16 @@ import { Router } from "express";
 import ProductService from "../services/product.service.js";
 import CartService from "../services/cart.service.js";
 import TicketService from "../services/ticket.service.js";
+
 const viewsRouter = Router();
+
 import passport from "passport";
 import { soloAdmin, soloUser } from "../middleware/auth.js";
 import jwt from "jsonwebtoken";
 import configObject from "../config/dotConfig.js";
-//Instanciamos nuestro manager de productos.
-
-
-
 
 const {secret_cookie, private_key} = configObject;
+
 // Products
 
 // Aplicamos paginate.
@@ -55,8 +54,7 @@ viewsRouter.get("/products", passport.authenticate("current", {session: false}),
             });
         }
 
-        // Imprimir productos para depuración
-        console.log(products.docs);
+        // console.log(products.docs);
 
         // Datos para la vista
         const payload = {
@@ -83,7 +81,7 @@ viewsRouter.get("/products", passport.authenticate("current", {session: false}),
 
         // Renderizar la vista con los productos
         res.status(200).render("home", {
-            products: payload.payload,  // Aquí pasamos directamente los productos
+            products: payload.payload,
             pagination: payload.pagination,
             query: payload.query,
             cid: cid
@@ -96,7 +94,7 @@ viewsRouter.get("/products", passport.authenticate("current", {session: false}),
 });
 
 
-// Este router va a trabajar con websocket. para actualizar automaticamente la vista.
+// Trabaja con websocket
 
 viewsRouter.get("/realtimeproducts", passport.authenticate("current", {session:false}), soloAdmin , (req,res) => {
     try {

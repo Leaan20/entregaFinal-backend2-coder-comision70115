@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import configObject from "./config/dotConfig.js";
+// Singleton en la DB
 
 const {mongo_url} = configObject;
 // Utilizamos el metodo de mongoose para poder conectarnos a la DB
